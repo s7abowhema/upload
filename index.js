@@ -136,7 +136,9 @@ app.get('/api/console/stream', (req, res) => {
     logClients.push({ res, serverId: req.query.serverId });
     
     const currentStatus = serverStatuses[req.query.serverId] || 'OFFLINE';
-    res.write(`data: ${JSON.stringify({ status: currentStatus })}\n\n`);
+    res.write(`data: ${JSON.stringify({ status: currentStatus })}
+
+`);
 
     req.on('close', () => { logClients = logClients.filter(c => c.res !== res); });
 });
@@ -144,7 +146,9 @@ app.get('/api/console/stream', (req, res) => {
 function emitLog(serverId, msg) {
     logClients.forEach(c => {
         if (c.serverId === serverId) {
-            c.res.write(`data: ${JSON.stringify({ log: msg, status: serverStatuses[serverId] })}\n\n`);
+            c.res.write(`data: ${JSON.stringify({ log: msg, status: serverStatuses[serverId] })}
+
+`);
         }
     });
 }
@@ -156,11 +160,10 @@ function findPythonScript(srvDir) {
     const pyFiles = files.filter(f => f.endsWith('.py') && !fs.statSync(path.join(srvDir, f)).isDirectory());
     
     if (pyFiles.length === 0) return null;
-    // يفضل main.py أو bot.py، وإلا يسحب أول ملف بايثون يجده (حتى لو كان رمزاً)
     return pyFiles.find(f => f === 'main.py' || f === 'bot.py') || pyFiles[0];
 }
 
-// [6] معالج تشغيل خوادم البايثون الفردية وتثبيت المتطلبات تلقائياً
+// [6] معالج تشغيل خوادم البايثون الفردية وتثبيت المتطلبات تلقائياً مع تفادي الانهيار
 app.post('/api/bot/control', (req, res) => {
     const { action, serverId } = req.body;
     const srvDir = path.resolve(__dirname, 'servers', serverId);
@@ -182,12 +185,15 @@ app.post('/api/bot/control', (req, res) => {
             return res.json({ status: 'success' });
         }
 
-        // فحص تلقائي وتثبيت للمكتبات المفقودة عبر requirements.txt
         const hasRequirements = fs.existsSync(path.join(srvDir, 'requirements.txt'));
         if (hasRequirements) {
-            emitLog(serverId, `\n\x1b[33m[OptikLink]: Found requirements.txt. Installing dependencies via pip...\x1b[0m\n`);
-            exec('pip install -r requirements.txt', { cwd: srvDir }, (err, stdout, stderr) => {
-                if(err) emitLog(serverId, `\n\x1b[31m[Pip Warning]: Some packages failed to install.\x1b[0m\n`);
+            emitLog(serverId, `\n\x1b[33m[OptikLink]: Found requirements.txt. Trying to install dependencies via pip...\x1b[0m\n`);
+            
+            // استخدام --user لمنع مشاكل الصلاحيات في Railway ومعالجة الخطأ لمنع الانهيار
+            exec('pip install --user -r requirements.txt', { cwd: srvDir }, (err, stdout, stderr) => {
+                if (err) {
+                    emitLog(serverId, `\n\x1b[31m⚠️ [Pip Error]: واجهت أداة pip مشكلة في التثبيت أو البيئة. سيتم محاولة تشغيل سكريبت البوت على أي حال...\x1b[0m\n`);
+                }
                 executePythonProcess(srvDir, scriptToRun, serverId);
             });
         } else {
@@ -209,7 +215,6 @@ function executePythonProcess(srvDir, script, serverId) {
     serverStatuses[serverId] = 'RUNNING';
     emitLog(serverId, `\n\x1b[32m[OptikLink]: Booting instance [python3 ${script}]...\x1b[0m\n`);
 
-    // تشغيل البايثون مع معامل الـ -u لمنع حجز الـ Logs وبثها حية فوراً للكونسول
     const proc = spawn('python3', ['-u', script], { cwd: srvDir });
     runningProcesses[serverId] = proc;
 
@@ -232,3 +237,4 @@ app.post('/api/console/command', (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`منصة استضافة بوتات البايثون تعمل على منفذ ${PORT}`));
+        
