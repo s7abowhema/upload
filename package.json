@@ -1,0 +1,27 @@
+{
+  "name": "optiklink-python-hosting",
+  "version": "1.0.0",
+  "description": "Isolated Python Bot Hosting Panel modeled after OptikLink",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "hosting",
+    "pterodactyl",
+    "optiklink",
+    "python",
+    "bot",
+    "telegram"
+  ],
+  "author": "S7ADOW",
+  "license": "MIT",
+  "dependencies": {
+    "adm-zip": "^0.5.14",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

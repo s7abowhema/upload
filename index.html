@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OptikLink - Python Bot Hosting</title>
+    <style>
+        :root {
+            --bg-dark: #080a10; --bg-card: #111520; --border: #1a202e;
+            --accent: #3b82f6; --green: #10b981; --red: #ef4444; --gray: #6b7280;
+        }
+        body { font-family: system-ui, sans-serif; background: var(--bg-dark); color: #f3f4f6; margin: 0; padding: 0; }
+        
+        .navbar { background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; height: 60px; }
+        .logo { font-weight: bold; font-size: 18px; color: #fff; }
+        .nav-tabs { display: flex; gap: 8px; }
+        .nav-btn { background: none; border: none; color: #9ca3af; font-weight: 600; font-size: 14px; cursor: pointer; padding: 8px 14px; border-radius: 4px; }
+        .nav-btn.active, .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.06); }
+
+        .container { max-width: 1200px; margin: 25px auto; padding: 0 15px; }
+        .hidden { display: none !important; }
+
+        .servers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .srv-card { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: 6px; cursor: pointer; }
+        .srv-card:hover { border-color: var(--accent); }
+        .srv-name { font-size: 17px; font-weight: bold; color: #fff; }
+        .srv-details { font-size: 12px; color: #9ca3af; margin: 6px 0 12px; }
+        
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        .badge-RUNNING { background: var(--green); }
+        .badge-OFFLINE { background: var(--red); }
+
+        .form-box { background: var(--bg-card); border: 1px solid var(--border); padding: 25px; border-radius: 6px; max-width: 450px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; color: #9ca3af; font-weight: bold; margin-bottom: 6px; text-transform: uppercase; }
+        .form-input { width: 100%; padding: 10px; background: #05070a; border: 1px solid var(--border); border-radius: 4px; color: #fff; outline: none; box-sizing: border-box; }
+
+        .resources { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+        .res-card { background: var(--bg-card); border: 1px solid var(--border); padding: 15px; border-radius: 6px; }
+        .res-title { font-size: 11px; color: #9ca3af; font-weight: bold; text-transform: uppercase; }
+        .res-value { font-size: 18px; font-weight: bold; color: #fff; margin-top: 4px; }
+        
+        .terminal { background: #020407; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-top: 15px; }
+        .screen { padding: 15px; font-family: monospace; height: 320px; overflow-y: auto; white-space: pre-wrap; font-size: 13px; color: #e2e8f0; }
+        .input-bar { display: flex; background: #000; padding: 12px 15px; border-top: 1px solid var(--border); }
+        .input-bar input { flex: 1; background: none; border: none; color: #fff; font-family: monospace; outline: none; }
+
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; color: white; }
+        .btn-blue { background: var(--accent); }
+        .btn-green { background: var(--green); }
+        .btn-red { background: var(--red); }
+
+        .file-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: var(--bg-card); border: 1px solid var(--border); margin-bottom: 8px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">OptikLink Python Cloud</div>
+        <div class="nav-tabs">
+            <button class="nav-btn active" id="t-list" onclick="navigate('list')">Python Servers</button>
+            <button class="nav-btn" id="t-create" onclick="navigate('create')">Create Server</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <div id="view-list">
+            <h3 style="margin-bottom:20px;">Python Instances</h3>
+            <div class="servers-grid" id="servers-container"></div>
+        </div>
+
+        <div id="view-create" class="hidden">
+            <div class="form-box">
+                <h3 style="margin-top:0; margin-bottom:20px;">Deploy Python Instance</h3>
+                <div class="form-group">
+                    <label>Bot Name</label>
+                    <input type="text" id="srv-name" class="form-input" placeholder="Telegram Bot">
+                </div>
+                <div class="form-group">
+                    <label>RAM Allocation (MB)</label>
+                    <input type="number" id="srv-ram" class="form-input" value="1024">
+                </div>
+                <div class="form-group">
+                    <label>Disk Storage (MB)</label>
+                    <input type="number" id="srv-disk" class="form-input" value="5120">
+                </div>
+                <button class="btn btn-blue" style="width:100%; padding:12px;" onclick="createServer()">Deploy Now</button>
+            </div>
+        </div>
+
+        <div id="view-manage" class="hidden">
+            <button class="btn btn-blue" style="margin-bottom:20px;" onclick="navigate('list')">← Back to Panel</button>
+            <h2 id="active-title" style="margin-bottom:15px;">Ecosystem</h2>
+            
+            <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                <button class="nav-btn active" id="sub-tab-console" onclick="switchSubView('console')">Console</button>
+                <button class="nav-btn" id="sub-tab-files" onclick="switchSubView('files')">File Manager</button>
+            </div>
+
+            <div id="sub-view-console">
+                <div class="resources">
+                    <div class="res-card"><div class="res-title">RAM Limit</div><div class="res-value" id="md-ram">1024 MB</div></div>
+                    <div class="res-card"><div class="res-title">Status</div><div class="res-value" id="md-status">OFFLINE</div></div>
+                </div>
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <button class="btn btn-green" onclick="controlBot('start')">START</button>
+                    <button class="btn btn-red" onclick="controlBot('stop')">STOP</button>
+                </div>
+                <div class="terminal">
+                    <div class="screen" id="console-logs">Awaiting connection...</div>
+                    <div class="input-bar">
+                        <input type="text" placeholder="Send process input..." id="console-input" onkeydown="sendCommand(event)">
+                    </div>
+                </div>
+            </div>
+
+            <div id="sub-view-files" class="hidden">
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                    <span>Path: <code>/home/container</code></span>
+                    <input type="file" id="file-selector" style="display:none;" onchange="uploadFile()">
+                    <button class="btn btn-green" onclick="document.getElementById('file-selector').click()">Upload Script/ZIP</button>
+                </div>
+                <div id="files-list-container"></div>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    let currentServerId = null;
+    let sseConnection = null;
+
+    function navigate(view) {
+        document.getElementById('view-list').classList.add('hidden');
+        document.getElementById('view-create').classList.add('hidden');
+        document.getElementById('view-manage').classList.add('hidden');
+        document.getElementById('t-list').classList.remove('active');
+        document.getElementById('t-create').classList.remove('active');
+        
+        if (view === 'list') {
+            document.getElementById('view-list').classList.remove('hidden');
+            document.getElementById('t-list').classList.add('active');
+            loadServers();
+        } else if (view === 'create') {
+            document.getElementById('view-create').classList.remove('hidden');
+            document.getElementById('t-create').classList.add('active');
+        } else if (view === 'manage') {
+            document.getElementById('view-manage').classList.remove('hidden');
+        }
+    }
+
+    function switchSubView(sub) {
+        document.getElementById('sub-view-console').classList.add('hidden');
+        document.getElementById('sub-view-files').classList.add('hidden');
+        document.getElementById('sub-tab-console').classList.remove('active');
+        document.getElementById('sub-tab-files').classList.remove('active');
+
+        if(sub === 'console') {
+            document.getElementById('sub-view-console').classList.remove('hidden');
+            document.getElementById('sub-tab-console').classList.add('active');
+        } else {
+            document.getElementById('sub-view-files').classList.remove('hidden');
+            document.getElementById('sub-tab-files').classList.add('active');
+            loadFiles();
+        }
+    }
+
+    async function createServer() {
+        const name = document.getElementById('srv-name').value;
+        const memory = document.getElementById('srv-ram').value;
+        const disk = document.getElementById('srv-disk').value;
+
+        if(!name) return alert('Server name required');
+
+        await fetch('/api/admin/create-server', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ name, memory, disk })
+        });
+        
+        navigate('list');
+    }
+
+    async function loadServers() {
+        const res = await fetch('/api/servers');
+        const data = await res.json();
+        const container = document.getElementById('servers-container');
+        container.innerHTML = "";
+
+        data.servers.forEach(s => {
+            container.innerHTML += `
+                <div class="srv-card" onclick="manageServer('${s.id}', '${s.name}', '${s.memory}')">
+                    <div class="srv-name">${s.name}</div>
+                    <div class="srv-details">Storage: ${s.disk} MB</div>
+                    <span class="badge badge-${s.status}">${s.status}</span>
+                </div>
+            `;
+        });
+    }
+
+    function manageServer(id, name, ram) {
+        currentServerId = id;
+        document.getElementById('active-title').textContent = `Instance: ${name}`;
+        document.getElementById('md-ram').textContent = `${ram} MB`;
+        navigate('manage');
+        switchSubView('console');
+
+        if(sseConnection) sseConnection.close();
+        document.getElementById('console-logs').innerText = "Connecting to Python daemon stream...";
+        
+        sseConnection = new EventSource(`/api/console/stream?serverId=${id}`);
+        sseConnection.onmessage = function(e) {
+            const res = JSON.parse(e.data);
+            if(res.log) {
+                const logs = document.getElementById('console-logs');
+                logs.innerText += "\n" + res.log;
+                logs.scrollTop = logs.scrollHeight;
+            }
+            if(res.status) {
+                document.getElementById('md-status').textContent = res.status;
+            }
+        };
+    }
+
+    async function controlBot(action) {
+        await fetch('/api/bot/control', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ action, serverId: currentServerId })
+        });
+    }
+
+    async function sendCommand(e) {
+        if (e.key === 'Enter') {
+            const input = document.getElementById('console-input');
+            const cmd = input.value.trim();
+            if(!cmd) return;
+            
+            document.getElementById('console-logs').innerText += `\n$ ${cmd}`;
+            input.value = '';
+
+            await fetch('/api/console/command', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ command: cmd, serverId: currentServerId })
+            });
+        }
+    }
+
+    async function loadFiles() {
+        const container = document.getElementById('files-list-container');
+        const res = await fetch(`/api/files?serverId=${currentServerId}`);
+        const data = await res.json();
+        container.innerHTML = "";
+
+        if(data.files.length === 0) {
+            container.innerHTML = '<div style="padding:20px; text-align:center; color:#9ca3af;">No files found.</div>';
+            return;
+        }
+
+        data.files.forEach(f => {
+            const isZip = f.name.toLowerCase().includes('.zip');
+            const unarchiveBtn = isZip ? `<button class="btn btn-blue" onclick="fileAction('unarchive', '${f.name}')" style="padding:4px 8px; margin-right:5px; font-size:10px;">Unarchive</button>` : '';
+            const icon = f.isFolder ? '📁' : '📄';
+
+            container.innerHTML += `
+                <div class="file-row">
+                    <span>${icon} ${f.name} <small style="color:#9ca3af; margin-left:10px;">(${f.size})</small></span>
+                    <div>
+                        ${unarchiveBtn}
+                        <button class="btn btn-red" onclick="fileAction('delete', '${f.name}')" style="padding:4px 8px; font-size:10px;">Delete</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function uploadFile() {
+        const selector = document.getElementById('file-selector');
+        if(selector.files.length === 0) return;
+
+        const fd = new FormData();
+        fd.append('file', selector.files[0]);
+
+        const xhr = new XMLHttpRequest();
+        xhr.onload = () => { selector.value = ""; loadFiles(); };
+        xhr.open('POST', `/api/files/upload?serverId=${currentServerId}`);
+        xhr.send(fd);
+    }
+
+    async function fileAction(action, name) {
+        await fetch('/api/files/action', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ action, fileName: name, serverId: currentServerId })
+        });
+        loadFiles();
+    }
+
+    loadServers();
+</script>
+</body>
+</html>
