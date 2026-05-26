@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARB DEVELOPER | مطور وبات وتساب</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
+            font-family: 'Cairo', sans-serif;
+            color: #eef5ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+        .portfolio-card {
+            max-width: 550px;
+            width: 100%;
+            background: rgba(18, 25, 45, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 3rem;
+            border: 1px solid rgba(72, 187, 255, 0.2);
+            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.5);
+            overflow: hidden;
+            transition: 0.2s;
+        }
+        .portfolio-card:hover {
+            transform: translateY(-5px);
+        }
+        .header-glow {
+            background: linear-gradient(135deg, #0e1a2a, #07111e);
+            padding: 2rem 1.8rem 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(0,255,255,0.2);
+        }
+        .badge-dev {
+            display: inline-block;
+            background: rgba(0,255,255,0.12);
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #7ce4ff;
+            border: 1px solid rgba(0,255,255,0.4);
+            margin-bottom: 1rem;
+        }
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: linear-gradient(120deg, #fff, #7ac7ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .sub-role {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #b9d9ff;
+            background: rgba(255,255,255,0.03);
+            display: inline-block;
+            padding: 0.2rem 1rem;
+            border-radius: 60px;
+            margin-top: 0.25rem;
+        }
+        .fullstack-tagline {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            color: #9bb4e6;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .social-row {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0 1rem;
+            flex-wrap: wrap;
+        }
+        .contact-btn {
+            background: rgba(15,25,45,0.8);
+            border-radius: 60px;
+            padding: 0.7rem 1.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            font-weight: 700;
+            border: 1px solid rgba(100,200,255,0.3);
+            transition: 0.2s;
+            color: #eef5ff;
+            text-decoration: none;
+        }
+        .contact-btn i { font-size: 1.25rem; }
+        .contact-btn.telegram:hover { background: #1f6f8f; border-color: #7ad0ff; }
+        .contact-btn.whatsapp:hover { background: #1f8f4e; border-color: #6bffb0; }
+        .skills-section {
+            padding: 1.6rem 1.8rem;
+            border-bottom: 1px solid rgba(72,187,255,0.15);
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.2rem;
+            color: #d6f0ff;
+        }
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9rem;
+        }
+        .skill-pill {
+            background: rgba(0,30,50,0.6);
+            padding: 0.5rem 1.3rem;
+            border-radius: 40px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(0,255,255,0.2);
+        }
+        .channel-section {
+            padding: 1.6rem 1.8rem 2rem;
+            text-align: center;
+        }
+        .channel-box {
+            background: linear-gradient(125deg, #0e1a2e, #091222);
+            border-radius: 2rem;
+            padding: 1.5rem 1rem;
+            border: 1px solid rgba(0,230,250,0.3);
+        }
+        .channel-icon { font-size: 2.2rem; color: #57c7ff; margin-bottom: 0.7rem; }
+        .channel-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,255,255,0.08);
+            padding: 0.7rem 1.6rem;
+            border-radius: 60px;
+            text-decoration: none;
+            color: #cdf2ff;
+            font-weight: 600;
+            border: 1px solid #2ea0c0;
+        }
+        .footer-note {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.7rem;
+            color: #5e7dac;
+            border-top: 1px solid rgba(72,187,255,0.1);
+        }
+        @media (max-width: 480px) {
+            h1 { font-size: 1.9rem; }
+            .contact-btn { padding: 0.5rem 1.2rem; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="portfolio-card">
+    <div class="header-glow">
+        <div class="badge-dev"><i class="fas fa-code"></i> ARB DEVELOPER</div>
+        <h1>ARB DEVELOPER</h1>
+        <div class="sub-role"><i class="fas fa-robot"></i> مطور وبات وتساب</div>
+        <div class="fullstack-tagline">
+            <i class="fas fa-globe"></i> Full Stack Web 
+            <span>|</span> 
+            <i class="fab fa-bots"></i> Bot Engineer
+        </div>
+    </div>
+    <div class="social-row">
+        <a href="https://t.me/your_telegram" target="_blank" class="contact-btn telegram"><i class="fab fa-telegram-plane"></i> Telegram</a>
+        <a href="https://wa.me/1234567890" target="_blank" class="contact-btn whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    </div>
+    <div class="skills-section">
+        <div class="section-title"><i class="fas fa-cog"></i> <span>My Skills</span></div>
+        <div class="skills-grid">
+            <div class="skill-pill"><i class="fab fa-js"></i> JavaScript</div>
+            <div class="skill-pill"><i class="fab fa-python"></i> Python</div>
+            <div class="skill-pill"><i class="fab fa-html5"></i> HTML & CSS</div>
+            <div class="skill-pill"><i class="fas fa-database"></i> MongoDB</div>
+            <div class="skill-pill"><i class="fab fa-node-js"></i> Node.js</div>
+        </div>
+    </div>
+    <div class="channel-section">
+        <div class="section-title" style="justify-content: center;"><i class="fab fa-telegram"></i> My Channel</div>
+        <div class="channel-box">
+            <div class="channel-icon"><i class="fab fa-telegram"></i></div>
+            <h3>ARB CHANNEL</h3>
+            <div class="channel-desc" style="margin:0.5rem 0;">أحدث الشروحات، أكواد البوتات، وأخبار التقنية</div>
+            <a href="https://t.me/arb_channel" target="_blank" class="channel-link"><i class="fab fa-telegram-plane"></i> انضم إلى القناة <i class="fas fa-arrow-left"></i></a>
+        </div>
+    </div>
+    <div class="footer-note"><i class="fas fa-code"></i> Full Stack & Bot Engineer | مطور محترف</div>
+</div>
+</body>
+</html>
